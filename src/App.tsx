@@ -86,7 +86,7 @@ export default function App() {
               <img 
                 src="/images/NexCube-full.png" 
                 alt="NexCube Digital Logo" 
-                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain transition-transform duration-300 group-hover:scale-105" 
+                className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 object-contain transition-transform duration-300 group-hover:scale-105" 
               />
               <div className="hidden xs:block">
                 <div className="text-lg sm:text-xl font-heading font-semibold">NexCube Digital</div>
@@ -162,7 +162,7 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-12">
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <img src="/images/NexCube-full.png" alt="NexCube Digital Logo" className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
+                  <img src="/images/NexCube-full.png" alt="NexCube Digital Logo" className="w-16 h-16 sm:w-24 sm:h-24 object-contain" />
                   <div>
                     <div className="text-lg sm:text-xl font-heading font-semibold">NexCube Digital</div>
                     <div className="text-xs sm:text-sm text-slate-300 mt-1">Premium Digital Solutions</div>
