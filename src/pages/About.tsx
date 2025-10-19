@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
 export const About: React.FC = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Set animasi entrance pada page load
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   const teamMembers = [
     {
       name: 'Aslam Mushtafa Karim',
@@ -33,7 +40,7 @@ export const About: React.FC = () => {
       
       <div className="container">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className={`text-center max-w-3xl mx-auto mb-16 hidden-initially ${isLoaded ? 'animate-fadeInUp' : ''}`}>
           <h1 className="heading-lg text-slate-900">Tentang NexCube Digital</h1>
           <p className="text-slate-500 mt-6 text-lg leading-relaxed">
             PT NexCube Digital adalah studio kreatif yang fokus pada solusi web dan desain premium untuk perusahaan dan UMKM. 
@@ -43,40 +50,42 @@ export const About: React.FC = () => {
         
         {/* Mission & Vision */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          <div className="bg-white p-8 rounded-xl shadow-card hover:shadow-premium transition-all">
-            <div className="bg-accent/10 text-accent p-3 w-14 h-14 flex items-center justify-center rounded-lg mb-5">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
+          {["Visi", "Misi", "Tim"].map((title, index) => (
+            <div 
+              key={title}
+              className={`bg-white p-8 rounded-xl shadow-card hover:shadow-premium transition-all hidden-initially ${isLoaded ? 'animate-fadeInUp' : ''}`}
+              style={{ animationDelay: `${200 + (index * 150)}ms` }}
+            >
+              <div className="bg-accent/10 text-accent p-3 w-14 h-14 flex items-center justify-center rounded-lg mb-5">
+                {title === "Visi" && (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                )}
+                {title === "Misi" && (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                )}
+                {title === "Tim" && (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                )}
+              </div>
+              <h2 className="text-xl font-heading font-semibold mb-3">{title}</h2>
+              <p className="text-slate-600">
+                {title === "Visi" && "Mendigitalisasi bisnis Indonesia dengan solusi teknologi yang inovatif, terjangkau, dan berkualitas global."}
+                {title === "Misi" && "Memberi solusi digital yang mudah, profesional, dan tepat guna untuk membantu pertumbuhan bisnis klien kami di era digital."}
+                {title === "Tim" && "Tim kami terdiri dari desainer UI/UX, developer, dan marketing specialist yang berpengalaman dalam industri digital."}
+              </p>
             </div>
-            <h2 className="text-xl font-heading font-semibold mb-3">Visi</h2>
-            <p className="text-slate-600">Mendigitalisasi bisnis Indonesia dengan solusi teknologi yang inovatif, terjangkau, dan berkualitas global.</p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-xl shadow-card hover:shadow-premium transition-all">
-            <div className="bg-accent/10 text-accent p-3 w-14 h-14 flex items-center justify-center rounded-lg mb-5">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-            </div>
-            <h2 className="text-xl font-heading font-semibold mb-3">Misi</h2>
-            <p className="text-slate-600">Memberi solusi digital yang mudah, profesional, dan tepat guna untuk membantu pertumbuhan bisnis klien kami di era digital.</p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-xl shadow-card hover:shadow-premium transition-all">
-            <div className="bg-accent/10 text-accent p-3 w-14 h-14 flex items-center justify-center rounded-lg mb-5">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            </div>
-            <h2 className="text-xl font-heading font-semibold mb-3">Tim</h2>
-            <p className="text-slate-600">Tim kami terdiri dari desainer UI/UX, developer, dan marketing specialist yang berpengalaman dalam industri digital.</p>
-          </div>
+          ))}
         </div>
         
         {/* Team Members */}

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PricingCard } from '../ui/PricingCard'
 
@@ -6,6 +6,9 @@ export const Home: React.FC = () => {
   const heroSectionRef = useRef<HTMLElement>(null);
   const pricingSectionRef = useRef<HTMLElement>(null);
   const testimonialSectionRef = useRef<HTMLElement>(null);
+  
+  // State untuk mengontrol animasi
+  const [isLoaded, setIsLoaded] = useState(false);
   
   // Fungsi scrolling yang lebih presisi
   const handleScrollToSection = (ref: React.RefObject<HTMLElement>, e?: React.MouseEvent) => {
@@ -22,6 +25,11 @@ export const Home: React.FC = () => {
       });
     }
   };
+  
+  // Set animasi entrance pada page load
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
   
   // Sesuaikan tinggi hero section saat window resize
   useEffect(() => {
@@ -43,7 +51,7 @@ export const Home: React.FC = () => {
   
   return (
     <div>
-      {/* Hero Section - Full Height */}
+      {/* Hero Section - Full Height with Animations */}
       <section 
         ref={heroSectionRef} 
         className="flex items-center pt-8 pb-12 bg-gradient-to-b from-slate-50 to-white"
@@ -51,27 +59,32 @@ export const Home: React.FC = () => {
         <div className="container grid md:grid-cols-2 gap-8 md:gap-16 items-center">
           <div className="space-y-6 sm:space-y-8">
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold leading-tight text-slate-900">
+              <h1 
+                className={`text-3xl sm:text-4xl md:text-5xl font-heading font-bold leading-tight text-slate-900 hidden-initially ${isLoaded ? 'animate-fadeInUp' : ''}`}
+              >
                 NexCube Digital — Solusi Digital Premium untuk Bisnis Anda
               </h1>
-              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-slate-600 leading-relaxed">
+              <p 
+                className={`mt-4 sm:mt-6 text-base sm:text-lg text-slate-600 leading-relaxed hidden-initially ${isLoaded ? 'animate-fadeInUp delay-200' : ''}`}
+              >
                 Kami menyediakan pembuatan website profesional, undangan digital, desain grafis, menu digital, katalog produk, dan banyak lagi — dengan paket Bronze hingga Platinum.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3 sm:gap-4">
+            <div className={`flex flex-wrap gap-3 sm:gap-4 hidden-initially ${isLoaded ? 'animate-fadeInUp delay-300' : ''}`}>
               <button 
                 onClick={(e) => handleScrollToSection(pricingSectionRef, e)} 
-                className="btn-primary text-sm sm:text-base"
+                className="btn-primary text-sm sm:text-base relative overflow-hidden group"
               >
-                Lihat Paket
+                <span className="relative z-10">Lihat Paket</span>
+                <span className="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
               </button>
               <Link to="/contact" className="btn-secondary text-sm sm:text-base">
                 Hubungi Kami
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-sm text-slate-500">
+            <div className={`flex flex-wrap items-center gap-4 sm:gap-8 text-sm text-slate-500 hidden-initially ${isLoaded ? 'animate-fadeInUp delay-400' : ''}`}>
               <div className="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -88,9 +101,9 @@ export const Home: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-premium mt-6 md:mt-0">
+          <div className={`bg-white rounded-2xl p-4 sm:p-8 shadow-premium mt-6 md:mt-0 hidden-initially ${isLoaded ? 'animate-scaleIn delay-200 animate-float' : ''}`}>
             <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 sm:gap-6">
-              <div className="p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1">
+              <div className={`p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1 hidden-initially ${isLoaded ? 'animate-fadeInUp delay-300' : ''}`}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="bg-accent/10 text-accent p-2 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -104,7 +117,7 @@ export const Home: React.FC = () => {
                 <div className="text-sm text-slate-500">Landing page sederhana, 2 revisi, 1 minggu pengerjaan</div>
               </div>
               
-              <div className="p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1">
+              <div className={`p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1 hidden-initially ${isLoaded ? 'animate-fadeInUp delay-400' : ''}`}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="bg-accent/10 text-accent p-2 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -118,7 +131,7 @@ export const Home: React.FC = () => {
                 <div className="text-sm text-slate-500">Template interaktif, RSVP, maps terintegrasi</div>
               </div>
               
-              <div className="p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1">
+              <div className={`p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1 hidden-initially ${isLoaded ? 'animate-fadeInUp delay-500' : ''}`}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="bg-accent/10 text-accent p-2 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +144,7 @@ export const Home: React.FC = () => {
                 <div className="text-sm text-slate-500">Poster, feed sosial media, kartu nama profesional</div>
               </div>
               
-              <div className="p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1">
+              <div className={`p-6 border rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-card hover:shadow-premium transition-all duration-300 hover:-translate-y-1 hidden-initially ${isLoaded ? 'animate-fadeInUp delay-600' : ''}`}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="bg-accent/10 text-accent p-2 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -152,17 +165,23 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Trusted By Section - Compact Height */}
-      <section className="py-10 bg-slate-50">
+      {/* Trusted By Section - with animation */}
+      <section className="py-10 bg-slate-50 overflow-hidden">
         <div className="container">
           <div className="text-center mb-4">
             <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Dipercaya oleh</h2>
             <div className="mt-5 flex flex-wrap justify-center items-center gap-6 sm:gap-x-12 sm:gap-y-6">
-              <img src="/images/clients/client-1.png" alt="Client Logo 1" className="h-8 sm:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src="/images/clients/client-2.png" alt="Client Logo 2" className="h-8 sm:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src="/images/clients/client-3.png" alt="Client Logo 3" className="h-8 sm:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src="/images/clients/client-4.png" alt="Client Logo 4" className="h-8 sm:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src="/images/clients/client-5.png" alt="Client Logo 5" className="h-8 sm:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              {[1, 2, 3, 4, 5].map((item, index) => (
+                <img 
+                  key={index}
+                  src={`/images/clients/client-${item}.png`} 
+                  alt={`Client Logo ${item}`}
+                  className={`h-8 sm:h-12 w-auto object-contain opacity-0 transform transition-all duration-700 ease-out ${
+                    isLoaded ? 'opacity-80 hover:opacity-100 translate-y-0' : 'translate-y-8'
+                  }`} 
+                  style={{ transitionDelay: `${600 + index * 150}ms` }}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -185,27 +204,27 @@ export const Home: React.FC = () => {
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
             <PricingCard 
               tier="Bronze" 
-              price="Rp 1.000.000" 
-              features={["Landing page 1 halaman","Template undangan dasar","2 revisi","Support 7 hari"]} 
+              price="Rp 800.000" 
+              features={["Awal Kehadiran Digital. Ideal untuk individu atau bisnis yang baru memasuki ruang online dan membutuhkan website company profile dasar yang efisien."]} 
               accent="bg-slate-50" 
             />
             <PricingCard 
               tier="Silver" 
-              price="Rp 2.500.000" 
-              features={["Website 3 halaman","Undangan interaktif","Desain 5 assets","Support 14 hari"]} 
+              price="Rp 1.200.000" 
+              features={["Pembangunan Brand dan Kepercayaan. Dirancang untuk pebisnis yang serius membangun citra digital yang kuat dan otoritatif."]} 
               accent="bg-white"
             />
             <PricingCard 
               tier="Gold" 
-              price="Rp 5.000.000" 
-              features={["Website 6 halaman","Katalog digital","SEO dasar","10 revisi","Support 30 hari"]} 
+              price="Rp 2.000.000" 
+              features={["Kompleksitas Layanan Tinggi. Ditujukan bagi perusahaan dengan beragam produk atau layanan yang membutuhkan struktur konten yang luas dan presentasi informasi yang mendalam."]} 
               accent="bg-gradient-to-br from-gold-light to-white" 
               popular={true}
             />
             <PricingCard 
               tier="Platinum" 
-              price="Rp 12.000.000" 
-              features={["Website custom","E-commerce","Integrasi pembayaran","Desain premium","Support prioritas 90 hari"]} 
+              price="Rp 5.000.000" 
+              features={["Kontrol Penuh & Kepemilikan Aset. Pilihan ideal bagi klien yang ingin memiliki kendali penuh atas infrastruktur, kode sumber, dan data tanpa ikatan biaya operasional vendor."]} 
               accent="bg-gradient-to-br from-slate-800 to-slate-850 text-white" 
             />
           </div>

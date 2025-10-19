@@ -6,13 +6,29 @@ import { Helmet } from 'react-helmet-async';
 const paketData = {
   bronze: {
     title: 'Bronze',
-    price: 'Rp 1.000.000',
+    price: 'Rp 800.000',
     description: 'Paket dasar untuk kebutuhan online sederhana',
     includes: [
-      'Landing page 1 halaman',
-      'Template undangan dasar',
-      '2 revisi',
-      'Support 7 hari'
+        '✔️Harga Include Domain dan Hosting.',
+        '❌Akses WP Admin.',
+        '❌Akses C-Panel.',
+        '✔️Halaman Maks. 3 Menu/Artikel.',
+        '✔️Bonus 1 Halaman Menu/Artikel.',
+        '✔️Gratis Pembuatan Konten.',
+        '✔️Gratis Design Logo.',
+        '✔️Gratis Domain .web.id.',
+        '❌Gratis E-mail bisnis.',
+        '✔️30 Foto Quota Kerja.',
+        '❌Video Quota Kerja.',
+        '✔️Gratis SSL 1 Tahun.',
+        '✔️Loading Cepat.',
+        '✔️Halaman Responsif.',
+        '✔️Mobile Friendly.',
+        '✔️Terintegrasi Dengan WhatsApp dan Telpon.',
+        '✔️Terintegrasi Dengan Media Sosial.',
+        '✔️Standar Kontak Form.',
+        '✔️Revisi Gratis Sepuasnya.',
+        '✔️Garansi Selama Berlangganan.',
     ],
     benefits: [
       'Setup cepat dalam 3 hari kerja',
@@ -32,13 +48,29 @@ const paketData = {
   },
   silver: {
     title: 'Silver',
-    price: 'Rp 2.500.000',
+    price: 'Rp 1.200.000',
     description: 'Paket menengah untuk website yang lebih lengkap',
     includes: [
-      'Website 3 halaman',
-      'Undangan interaktif',
-      'Desain 5 assets',
-      'Support 14 hari'
+        '✔️Harga Include Domain dan Hosting.',
+        '❌Akses WP Admin.',
+        '❌Akses C-Panel.',
+        '✔️Halaman Maks. 5 Menu/Artikel.',
+        '✔️Bonus 1 Halaman Menu/Artikel.',
+        '✔️Gratis Pembuatan Konten.',
+        '✔️Gratis Design Logo.',
+        '✔️Gratis Domain .com/.id.',
+        '❌Gratis E-mail bisnis.',
+        '✔️50 Foto Quota Kerja.',
+        '✔️1 Video Quota Kerja.',
+        '✔️Gratis SSL 1 Tahun.',
+        '✔️Loading Cepat.',
+        '✔️Halaman Responsif.',
+        '✔️Mobile Friendly.',
+        '✔️Terintegrasi Dengan WhatsApp dan Telpon.',
+        '✔️Terintegrasi Dengan Media Sosial.',
+        '✔️Standar Kontak Form.',
+        '✔️Revisi Gratis Sepuasnya.',
+        '✔️Garansi Selama Berlangganan.',
     ],
     benefits: [
       'Setup dalam 5 hari kerja',
@@ -60,14 +92,29 @@ const paketData = {
   },
   gold: {
     title: 'Gold',
-    price: 'Rp 5.000.000',
+    price: 'Rp 2.000.000',
     description: 'Paket premium untuk website profesional dan katalog digital',
     includes: [
-      'Website 6 halaman',
-      'Katalog digital',
-      'SEO dasar',
-      '10 revisi',
-      'Support 30 hari'
+        '✔️Harga Include Domain dan Hosting.',
+        '✔️Akses WP Admin.',
+        '❌Akses C-Panel.',
+        '✔️Halaman Maks. 10 Menu/Artikel.',
+        '✔️Bonus 1 Halaman Menu/Artikel.',
+        '✔️Gratis Pembuatan Konten.',
+        '✔️Gratis Design Logo.',
+        '✔️Gratis Domain .com/.id/.co.id.',
+        '✔️Gratis E-mail bisnis.',
+        '✔️90 Foto Quota Kerja.',
+        '✔️3 Video Quota Kerja.',
+        '✔️Gratis SSL 1 Tahun.',
+        '✔️Loading Cepat.',
+        '✔️Halaman Responsif.',
+        '✔️Mobile Friendly.',
+        '✔️Terintegrasi Dengan WhatsApp dan Telpon.',
+        '✔️Terintegrasi Dengan Media Sosial.',
+        '✔️Standar Kontak Form.',
+        '✔️Revisi Gratis Sepuasnya.',
+        '✔️Garansi Selama Berlangganan.',
     ],
     benefits: [
       'Custom design',
@@ -91,15 +138,29 @@ const paketData = {
     color: 'bg-gradient-to-br from-gold-light to-white'
   },
   platinum: {
-    title: 'Platinum',
-    price: 'Rp 12.000.000',
+    title: 'None',
+    price: 'Rp 5.000.000',
     description: 'Paket premium lengkap untuk solusi digital skala penuh',
     includes: [
-      'Website custom',
-      'E-commerce',
-      'Integrasi pembayaran',
-      'Desain premium',
-      'Support prioritas 90 hari'
+        '✔️Harga Include Domain dan Hosting.',
+        '✔️Akses WP Admin.',
+        '✔️Akses C-Panel.',
+        '✔️Halaman (Sesuai Kebutuhan).',
+        '✔️Gratis Pembuatan Konten.',
+        '✔️Gratis Design Logo.',
+        '✔️Gratis Domain .com/.id/.co.id.',
+        '✔️Gratis E-mail bisnis.',
+        '✔️Foto Quota Kerja (Sesuai Kebutuhan).',
+        '✔️Video Quota Kerja (Sesuai Kebutuhan).',
+        '✔️Gratis SSL 1 Tahun.',
+        '✔️Loading Cepat.',
+        '✔️Halaman Responsif.',
+        '✔️Mobile Friendly.',
+        '✔️Terintegrasi Dengan WhatsApp dan Telpon.',
+        '✔️Terintegrasi Dengan Media Sosial.',
+        '✔️Standar Kontak Form.',
+        '✔️Revisi Gratis Sepuasnya.',
+        '✔️Garansi Selama Berlangganan.',
     ],
     benefits: [
       'Fully custom design',
@@ -129,6 +190,22 @@ const paketData = {
   }
 };
 
+// Fungsi untuk memproses teks includes dengan ikon yang konsisten
+const processIncludeItem = (item: string) => {
+  if (item.startsWith('✔️')) {
+    return {
+      included: true,
+      text: item.replace('✔️', '').trim()
+    };
+  } else if (item.startsWith('❌')) {
+    return {
+      included: false,
+      text: item.replace('❌', '').trim()
+    };
+  }
+  return { included: true, text: item };
+};
+
 export const PaketDetail: React.FC = () => {
   const { tier = '' } = useParams<{ tier: string }>();
   const paket = paketData[tier as keyof typeof paketData] || {
@@ -145,6 +222,27 @@ export const PaketDetail: React.FC = () => {
   
   const isSpecialTier = paket.color?.includes('from-slate-800') || false;
   const isGoldTier = tier === 'gold';
+
+  // Organize includes into categories for better display
+  const groupedIncludes = {
+    core: [] as string[],
+    features: [] as string[],
+    design: [] as string[],
+    support: [] as string[]
+  };
+
+  // Group includes by category if needed
+  paket.includes.forEach((item) => {
+    if (item.includes('Domain') || item.includes('Hosting') || item.includes('Halaman')) {
+      groupedIncludes.core.push(item);
+    } else if (item.includes('Akses') || item.includes('Gratis')) {
+      groupedIncludes.features.push(item);
+    } else if (item.includes('Design') || item.includes('Responsif') || item.includes('Friendly')) {
+      groupedIncludes.design.push(item);
+    } else {
+      groupedIncludes.support.push(item);
+    }
+  });
 
   return (
     <div className="min-h-screen py-8 sm:py-16 bg-gradient-to-b from-slate-50/50 to-white">
@@ -175,37 +273,36 @@ export const PaketDetail: React.FC = () => {
 
           <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
             <div>
-              <h2 className={`text-xl font-heading font-semibold mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Yang Termasuk</h2>
-              <ul className="space-y-3">
-                {paket.includes.map((item, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className={`inline-flex mt-1 items-center justify-center w-5 h-5 rounded-full ${
-                      isSpecialTier ? 'bg-white/20' : isGoldTier ? 'bg-gold-light' : 'bg-accent/10'
-                    }`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isSpecialTier ? 'white' : '#0284c7'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    </span>
-                    <span className={isSpecialTier ? 'text-white' : ''}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <h2 className={`text-xl font-heading font-semibold mt-12 mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Benefit Tambahan</h2>
-              <ul className="space-y-3">
-                {paket.benefits.map((item, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className={`inline-flex mt-1 items-center justify-center w-5 h-5 rounded-full ${
-                      isSpecialTier ? 'bg-white/20' : 'bg-gold-light/30'
-                    }`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isSpecialTier ? 'white' : '#c8a355'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></path>
-                      </svg>
-                    </span>
-                    <span className={isSpecialTier ? 'text-white' : ''}>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <h2 className={`text-xl font-heading font-semibold mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Fitur Paket</h2>
+              
+              <div className="space-y-6">
+                {paket.includes.map((item, index) => {
+                  const { included, text } = processIncludeItem(item);
+                  return (
+                    <div key={index} className="flex items-start gap-3">
+                      <span className={`flex-shrink-0 inline-flex mt-0.5 items-center justify-center w-5 h-5 rounded-full ${
+                        included ? 
+                          (isSpecialTier ? 'bg-white/30 text-white' : 'bg-green-100 text-green-600') : 
+                          (isSpecialTier ? 'bg-white/10 text-white/60' : 'bg-red-50 text-red-400')
+                      }`}>
+                        {included ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        )}
+                      </span>
+                      <span className={`${isSpecialTier ? 'text-white' : ''} ${!included && 'text-opacity-70'}`}>
+                        {text}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
 
               <div className={`mt-10 p-4 rounded-lg ${isSpecialTier ? 'bg-white/10 text-white/90' : 'bg-slate-50 text-slate-600'}`}>
                 <strong>Ideal untuk:</strong> {paket.idealFor}
@@ -213,20 +310,43 @@ export const PaketDetail: React.FC = () => {
             </div>
 
             <div>
-              <h2 className={`text-xl font-heading font-semibold mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Timeline Pengerjaan</h2>
-              <p className={`text-lg mb-8 ${isSpecialTier ? 'text-white/90' : ''}`}>{paket.timeline}</p>
+              <div className="mb-10">
+                <h2 className={`text-xl font-heading font-semibold mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Benefit Tambahan</h2>
+                <ul className="space-y-3">
+                  {paket.benefits.map((item, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className={`inline-flex mt-1 items-center justify-center w-5 h-5 rounded-full ${
+                        isSpecialTier ? 'bg-white/20' : 'bg-gold-light/30'
+                      }`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isSpecialTier ? 'white' : '#c8a355'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></path>
+                        </svg>
+                      </span>
+                      <span className={isSpecialTier ? 'text-white' : ''}>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-              <h2 className={`text-xl font-heading font-semibold mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Proses Pengerjaan</h2>
-              <ol className={`relative border-l ${isSpecialTier ? 'border-white/30' : 'border-slate-200'} space-y-6 pl-6`}>
-                {paket.process.map((step, index) => (
-                  <li key={index} className="relative">
-                    <div className={`absolute -left-[31px] flex items-center justify-center w-6 h-6 rounded-full bg-white ${isSpecialTier ? 'border-2 border-white/70' : 'border-2 border-accent'}`}>
-                      <span className={`text-xs font-medium ${isSpecialTier ? 'text-slate-800' : 'text-accent'}`}>{index + 1}</span>
-                    </div>
-                    <p className={`font-medium ${isSpecialTier ? 'text-white' : ''}`}>{step}</p>
-                  </li>
-                ))}
-              </ol>
+              <div>
+                <h2 className={`text-xl font-heading font-semibold mb-6 ${isSpecialTier ? 'text-white' : ''}`}>Timeline & Proses</h2>
+                <div className={`p-4 mb-6 rounded-lg ${isSpecialTier ? 'bg-white/10' : 'bg-slate-50'}`}>
+                  <p className={`font-medium ${isSpecialTier ? 'text-white' : 'text-slate-700'}`}>
+                    {paket.timeline}
+                  </p>
+                </div>
+                
+                <ol className={`relative border-l ${isSpecialTier ? 'border-white/30' : 'border-slate-200'} space-y-6 pl-6`}>
+                  {paket.process.map((step, index) => (
+                    <li key={index} className="relative">
+                      <div className={`absolute -left-[31px] flex items-center justify-center w-6 h-6 rounded-full bg-white ${isSpecialTier ? 'border-2 border-white/70' : 'border-2 border-accent'}`}>
+                        <span className={`text-xs font-medium ${isSpecialTier ? 'text-slate-800' : 'text-accent'}`}>{index + 1}</span>
+                      </div>
+                      <p className={`font-medium ${isSpecialTier ? 'text-white' : ''}`}>{step}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           </div>
 
@@ -250,6 +370,7 @@ export const PaketDetail: React.FC = () => {
           </div>
         </div>
         
+        {/* FAQ section with accordion */}
         <div className="mt-12 bg-white p-6 md:p-10 rounded-xl shadow-card">
           <h2 className="text-xl font-heading font-semibold mb-6">Pertanyaan Umum tentang Paket {paket.title}</h2>
           
