@@ -19,19 +19,22 @@ export const About: React.FC = () => {
       name: 'Aslam Mushtafa Karim',
       position: 'CEO',
       image: '/images/team/team-1.jpg',
-      bio: 'Berpengalaman lebih dari 5 tahun dalam industri programer dan digital marketing.'
+      bio: 'Berpengalaman lebih dari 5 tahun dalam industri programer dan digital marketing.',
+      portfolioUrl: 'https://aslam2025.netlify.app/'
     },
     {
       name: 'Bela Amelia Nuralfiani',
       position: 'Project Manager',
       image: '/images/team/team-2.jpg',
-      bio: 'Berpengalaman dalam managenent mengatur Tim.'
+      bio: 'Berpengalaman dalam managenent mengatur Tim.',
+      portfolioUrl: 'https://example.com/bela'
     },
     {
-      name: 'Budi Santoso',
-      position: 'Creative Director',
+      name: 'Muhammad Regi Taryana',
+      position: 'Backend Developer',
       image: '/images/team/team-3.jpg',
-      bio: 'Spesialis dalam branding dan strategi kreatif untuk berbagai industri.'
+      bio: 'Spesialis dalam branding dan strategi kreatif untuk berbagai industri.',
+      portfolioUrl: 'https://example.com/regi'
     }
   ];
 
@@ -97,22 +100,30 @@ export const About: React.FC = () => {
           <h2 className={`text-2xl font-heading font-semibold mb-8 text-center ${!isLoaded ? 'opacity-0' : 'animate-fadeInUp delay-600'}`}>Tim Profesional Kami</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
-              <div 
+              <a 
                 key={index} 
+                href={member.portfolioUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{ animationDelay: `${700 + (index * 150)}ms` }}
-                className={`bg-white rounded-xl overflow-hidden shadow-card hover:shadow-premium transition-all ${!isLoaded ? 'opacity-0' : 'animate-fadeInUp'}`}
+                className={`bg-white rounded-xl overflow-hidden shadow-card hover:shadow-premium transition-all group ${!isLoaded ? 'opacity-0' : 'animate-fadeInUp'}`}
               >
-                <img 
-                  src={member.image} 
-                  alt={`Foto ${member.name}`} 
-                  className="w-full h-48 object-cover object-center" 
-                />
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={member.image} 
+                    alt={`Foto ${member.name}`} 
+                    className="w-full h-48 object-cover object-center transition-transform duration-300 group-hover:scale-105" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                    <span className="text-white font-medium px-4 py-2 rounded-full bg-accent/80 text-sm">Lihat Portofolio</span>
+                  </div>
+                </div>
                 <div className="p-6">
-                  <h3 className="font-heading font-semibold text-lg">{member.name}</h3>
+                  <h3 className="font-heading font-semibold text-lg group-hover:text-accent transition-colors">{member.name}</h3>
                   <p className="text-accent text-sm mb-3">{member.position}</p>
                   <p className="text-slate-600 text-sm">{member.bio}</p>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>

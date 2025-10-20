@@ -22,7 +22,7 @@ const services = [
       'Integrasi formulir kontak',
       'Paket khusus mahasiswa tersedia'
     ],
-    linkTo: '/paket/bronze'
+    linkTo: '/paket'
   },
   { 
     title: 'Undangan Digital', 
@@ -43,7 +43,7 @@ const services = [
       'Galeri foto',
       'Countdown timer'
     ],
-    linkTo: '/paket/silver'
+    linkTo: '/undangan-digital'
   },
   { 
     title: 'Desain Grafis', 
@@ -63,7 +63,7 @@ const services = [
       'Kartu nama dan kop surat',
       'Material branding lainnya'
     ],
-    linkTo: '/paket/gold'
+    linkTo: '/desain-grafis'
   },
   { 
     title: 'Menu & Katalog', 
@@ -86,7 +86,7 @@ const services = [
       'Tampilan yang menarik',
       'Responsif di semua perangkat'
     ],
-    linkTo: '/paket/platinum'
+    linkTo: '/menu-katalog'
   }
 ];
 

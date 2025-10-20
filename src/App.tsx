@@ -8,6 +8,10 @@ const Services = lazy(() => import('./pages/Services').then(module => ({ default
 const Contact = lazy(() => import('./pages/Contact').then(module => ({ default: module.Contact })));
 const About = lazy(() => import('./pages/About').then(module => ({ default: module.About })));
 const PaketDetail = lazy(() => import('./pages/PaketDetail').then(module => ({ default: module.PaketDetail })));
+const Paket = lazy(() => import('./pages/Paket').then(module => ({ default: module.Paket })));
+const UndanganDigital = lazy(() => import('./pages/UndanganDigital').then(module => ({ default: module.UndanganDigital })));
+const DesainGrafis = lazy(() => import('./pages/DesainGrafis').then(module => ({ default: module.DesainGrafis })));
+const MenuKatalog = lazy(() => import('./pages/MenuKatalog').then(module => ({ default: module.MenuKatalog })));
 const NotFound = lazy(() => import('./pages/NotFound').then(module => ({ default: module.NotFound })));
 
 // Loading spinner for lazy loaded components
@@ -33,6 +37,17 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       {children}
     </div>
   );
+};
+
+// Tambahkan komponen untuk handling navigasi yang lebih mulus
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
 };
 
 export default function App() {
@@ -80,6 +95,9 @@ export default function App() {
   return (
     <HelmetProvider>
       <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-800 font-sans">
+        {/* Komponen untuk scroll ke atas pada setiap navigasi */}
+        <ScrollToTop />
+        
         <header className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-white shadow-sm'}`}>
           <div className="container flex items-center justify-between h-16 sm:h-20 md:h-24">
             <Link to="/" className="flex items-center gap-2 sm:gap-4 group">
@@ -150,7 +168,11 @@ export default function App() {
                 <Route path="/services" element={<Services />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/paket" element={<Paket />} />
                 <Route path="/paket/:tier" element={<PaketDetail />} />
+                <Route path="/undangan-digital" element={<UndanganDigital />} />
+                <Route path="/desain-grafis" element={<DesainGrafis />} />
+                <Route path="/menu-katalog" element={<MenuKatalog />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </PageTransition>
