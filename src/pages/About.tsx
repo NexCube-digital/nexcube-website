@@ -24,9 +24,9 @@ export const About: React.FC = () => {
     },
     {
       name: 'Bela Amelia Nuralfiani',
-      position: 'Project Manager',
+      position: 'UI/UX Designer',
       image: '/images/team/team-2.jpg',
-      bio: 'Berpengalaman dalam managenent mengatur Tim.',
+      bio: 'Berpengalaman dalam desain antarmuka pengguna dan pengalaman pengguna untuk berbagai platform digital.',
       portfolioUrl: 'https://example.com/bela'
     },
     {
