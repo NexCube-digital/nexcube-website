@@ -43,7 +43,13 @@ export const About: React.FC = () => {
       bio: 'Berpengalaman dalam pengembangan website responsif dan aplikasi web modern.',
       portfolioUrl: 'https://alifalfariziportfolio.netlify.app/'
     },
-    
+    {
+      name: 'Okta Ramdani',
+      position: 'Backend Developer',
+      image: '/images/team/an.jpeg',
+      bio: 'Berpengalaman dalam pengembangan website responsif dan aplikasi web modern.',
+      portfolioUrl: 'https://oktaramdani.netlify.app/'
+    },
   ];
 
   return (
