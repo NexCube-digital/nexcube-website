@@ -55,7 +55,7 @@ export const About: React.FC = () => {
     {
       name: 'Okta Ramdani',
       position: 'Full Stack Developer',
-      image: '/images/team/an.jpeg',
+      image: '/images/team/team-5.png',
       bio: 'Developer serbaguna yang menguasai teknologi frontend dan backend untuk solusi end-to-end.',
       portfolioUrl: 'https://oktaramdani.netlify.app/',
       expertise: ['Full Stack Development', 'DevOps', 'Cloud Solutions'],

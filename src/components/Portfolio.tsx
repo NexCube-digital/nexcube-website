@@ -92,12 +92,12 @@ export const Portfolio: React.FC = () => {
     },
     {
       id: '5',
-      title: 'E-Commerce Platform',
+      title: 'Desain Menu Karomah',
       category: 'Desain Grafis',
-      description: 'Platform e-commerce lengkap dengan sistem pembayaran, manajemen inventory, dan dashboard penjual.',
-      image: '/images/portfolio/ecommerce-platform.jpg',
-      client: 'TechStore Indonesia',
-      technologies: ['Figma', 'Adobe Creative Suite', 'Canva Pro', 'Adobe Stock'],
+      description: 'Desain grafis menu restoran modern dan menarik untuk Karomah Food.',
+      image: '/images/portfolio/menu.png',
+      client: 'Karomah Food',
+      technologies: ['Adobe Creative Suite', 'Canva Pro', 'Adobe Stock'],
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
