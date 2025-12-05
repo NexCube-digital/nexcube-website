@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import html2pdf from 'html2pdf.js'
+import apiClient, { Contact, Portfolio, Invoice, Finance } from '../../services/api'
 
 interface ReportData {
   type: 'clients' | 'invoices' | 'finance'
@@ -16,23 +17,73 @@ export const ReportManagement: React.FC = () => {
   const [dateStart, setDateStart] = useState('')
   const [dateEnd, setDateEnd] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [clientsData, setClientsData] = useState<Contact[]>([])
+  const [portfoliosData, setPortfoliosData] = useState<Portfolio[]>([])
+  const [invoicesData, setInvoicesData] = useState<Invoice[]>([])
+  const [financesData, setFinancesData] = useState<Finance[]>([])
   const reportRef = useRef<HTMLDivElement>(null)
 
-  // Dummy data untuk laporan
-  const clientsData = [
-    { id: '1', name: 'PT Maju Bersama', email: 'info@majubersama.com', phone: '+62 812 3456 7890', company: 'PT Maju Bersama', status: 'aktif', createdAt: '2024-01-15' },
-    { id: '2', name: 'Karomah Food', email: 'karomah@email.com', phone: '+62 813 4567 8901', company: 'Karomah Food', status: 'aktif', createdAt: '2024-01-20' }
-  ]
+  // Load real data dari backend
+  const loadReportData = async () => {
+    try {
+      setLoading(true)
+      
+      // Load Contacts
+      const contactsResponse = await apiClient.getContacts()
+      if (contactsResponse.success && Array.isArray(contactsResponse.data)) {
+        setClientsData(contactsResponse.data)
+      } else {
+        setClientsData([])
+      }
 
-  const invoicesData = [
-    { id: '1', invoiceNumber: 'INV-2024-001', clientName: 'PT Maju Bersama', totalAmount: 3500000, status: 'website', issueDate: '2024-01-15', dueDate: '2024-02-15' },
-    { id: '2', invoiceNumber: 'INV-2024-002', clientName: 'Karomah Food', totalAmount: 1200000, status: 'desain', issueDate: '2024-01-20', dueDate: '2024-02-20' }
-  ]
+      // Load Portfolios
+      const portfoliosResponse = await apiClient.getPortfolios()
+      if (portfoliosResponse.success && Array.isArray(portfoliosResponse.data)) {
+        setPortfoliosData(portfoliosResponse.data)
+      } else {
+        setPortfoliosData([])
+      }
 
-  const financeData = [
-    { id: '1', date: '2024-01-20', type: 'income', category: 'Project Payment', description: 'Website Development - PT Maju Bersama', amount: 2000000, status: 'completed' },
-    { id: '2', date: '2024-01-19', type: 'expense', category: 'Operational', description: 'Sewa Kantor Januari', amount: 500000, status: 'completed' }
-  ]
+      // Load Invoices
+      try {
+        const invoicesResponse = await apiClient.getInvoices()
+        if (invoicesResponse.success && Array.isArray(invoicesResponse.data)) {
+          setInvoicesData(invoicesResponse.data)
+        } else {
+          setInvoicesData([])
+        }
+      } catch (error) {
+        console.warn('Failed to load invoices:', error)
+        setInvoicesData([])
+      }
+
+      // Load Finances
+      try {
+        const financesResponse = await apiClient.getFinances()
+        if (financesResponse.success && Array.isArray(financesResponse.data)) {
+          setFinancesData(financesResponse.data)
+        } else {
+          setFinancesData([])
+        }
+      } catch (error) {
+        console.warn('Failed to load finances:', error)
+        setFinancesData([])
+      }
+    } catch (error) {
+      console.error('Failed to load report data:', error)
+      setClientsData([])
+      setPortfoliosData([])
+      setInvoicesData([])
+      setFinancesData([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadReportData()
+  }, [])
 
   const handleGeneratePDF = () => {
     if (!reportRef.current) return
@@ -196,7 +247,7 @@ export const ReportManagement: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {clientsData.map((client, index) => (
+                {Array.isArray(clientsData) && clientsData.map((client, index) => (
                   <tr key={client.id} className="border-b border-slate-200 hover:bg-slate-50">
                     <td className="px-4 py-2 text-slate-700">{index + 1}</td>
                     <td className="px-4 py-2 text-slate-700 font-medium">{client.name}</td>
@@ -205,9 +256,9 @@ export const ReportManagement: React.FC = () => {
                     <td className="px-4 py-2 text-slate-600">{client.company}</td>
                     <td className="px-4 py-2">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        client.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        client.status === 'responded' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
                       }`}>
-                        {client.status === 'aktif' ? 'Aktif' : 'Tidak Aktif'}
+                        {client.status === 'responded' ? 'Responded' : 'Pending'}
                       </span>
                     </td>
                   </tr>
@@ -215,8 +266,8 @@ export const ReportManagement: React.FC = () => {
               </tbody>
             </table>
             <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-              <p className="text-sm text-slate-700"><strong>Total Klien:</strong> {clientsData.length}</p>
-              <p className="text-sm text-slate-700"><strong>Klien Aktif:</strong> {clientsData.filter(c => c.status === 'aktif').length}</p>
+              <p className="text-sm text-slate-700"><strong>Total Klien:</strong> {Array.isArray(clientsData) ? clientsData.length : 0}</p>
+              <p className="text-sm text-slate-700"><strong>Klien Responded:</strong> {Array.isArray(clientsData) ? clientsData.filter(c => c.status === 'responded').length : 0}</p>
             </div>
           </div>
         )}
@@ -231,33 +282,48 @@ export const ReportManagement: React.FC = () => {
                   <th className="px-4 py-2 text-left font-bold text-slate-800">No. Invoice</th>
                   <th className="px-4 py-2 text-left font-bold text-slate-800">Klien</th>
                   <th className="px-4 py-2 text-left font-bold text-slate-800">Tanggal</th>
-                  <th className="px-4 py-2 text-right font-bold text-slate-800">Jumlah</th>
+                  <th className="px-4 py-2 text-left font-bold text-slate-800">Layanan</th>
+                  <th className="px-4 py-2 text-right font-bold text-slate-800">Harga</th>
                   <th className="px-4 py-2 text-left font-bold text-slate-800">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {invoicesData.map((invoice, index) => (
+                {Array.isArray(invoicesData) && invoicesData.length > 0 ? invoicesData.map((invoice, index) => (
                   <tr key={invoice.id} className="border-b border-slate-200 hover:bg-slate-50">
                     <td className="px-4 py-2 text-slate-700">{index + 1}</td>
                     <td className="px-4 py-2 text-slate-700 font-medium">{invoice.invoiceNumber}</td>
                     <td className="px-4 py-2 text-slate-600">{invoice.clientName}</td>
                     <td className="px-4 py-2 text-slate-600">{invoice.issueDate}</td>
-                    <td className="px-4 py-2 text-right text-slate-700 font-semibold">{formatCurrency(invoice.totalAmount)}</td>
+                    <td className="px-4 py-2 text-slate-600">
+                      {invoice.service === 'website' ? 'Website' :
+                       invoice.service === 'undangan' ? 'Undangan Digital' :
+                       invoice.service === 'desain' ? 'Desain Grafis' :
+                       invoice.service === 'katalog' ? 'Katalog Digital' : invoice.service}
+                    </td>
+                    <td className="px-4 py-2 text-right text-slate-700 font-semibold">{formatCurrency(Math.round(invoice.amount))}</td>
                     <td className="px-4 py-2">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        invoice.status === 'website' ? 'bg-blue-100 text-blue-700' :
-                        invoice.status === 'desain' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'
+                        invoice.status === 'paid' ? 'bg-green-100 text-green-700' :
+                        invoice.status === 'sent' ? 'bg-blue-100 text-blue-700' :
+                        invoice.status === 'draft' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
                       }`}>
-                        {invoice.status === 'website' ? 'Website' : invoice.status === 'desain' ? 'Desain' : 'Lainnya'}
+                        {invoice.status === 'paid' ? 'Terbayar' :
+                         invoice.status === 'sent' ? 'Terkirim' :
+                         invoice.status === 'draft' ? 'Draft' : 'Jatuh Tempo'}
                       </span>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-4 text-center text-slate-600">Tidak ada data invoice</td>
+                  </tr>
+                )}
               </tbody>
             </table>
             <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-              <p className="text-sm text-slate-700"><strong>Total Invoice:</strong> {invoicesData.length}</p>
-              <p className="text-sm text-slate-700"><strong>Total Revenue:</strong> {formatCurrency(invoicesData.reduce((sum, inv) => sum + inv.totalAmount, 0))}</p>
+              <p className="text-sm text-slate-700"><strong>Total Invoice:</strong> {Array.isArray(invoicesData) ? invoicesData.length : 0}</p>
+              <p className="text-sm text-slate-700"><strong>Total Revenue:</strong> {formatCurrency(Array.isArray(invoicesData) ? Math.round(invoicesData.reduce((sum, inv) => sum + Number(inv.amount), 0)) : 0)}</p>
             </div>
           </div>
         )}
@@ -273,14 +339,15 @@ export const ReportManagement: React.FC = () => {
                   <th className="px-4 py-2 text-left font-bold text-slate-800">Tipe</th>
                   <th className="px-4 py-2 text-left font-bold text-slate-800">Kategori</th>
                   <th className="px-4 py-2 text-left font-bold text-slate-800">Deskripsi</th>
+                  <th className="px-4 py-2 text-left font-bold text-slate-800">Metode</th>
                   <th className="px-4 py-2 text-right font-bold text-slate-800">Jumlah</th>
                 </tr>
               </thead>
               <tbody>
-                {financeData.map((transaction, index) => (
+                {Array.isArray(financesData) && financesData.length > 0 ? financesData.map((transaction, index) => (
                   <tr key={transaction.id} className="border-b border-slate-200 hover:bg-slate-50">
                     <td className="px-4 py-2 text-slate-700">{index + 1}</td>
-                    <td className="px-4 py-2 text-slate-600">{transaction.date}</td>
+                    <td className="px-4 py-2 text-slate-600">{new Date(transaction.date).toLocaleDateString('id-ID')}</td>
                     <td className="px-4 py-2">
                       <span className={`px-2 py-1 rounded text-xs font-bold ${
                         transaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
@@ -290,17 +357,22 @@ export const ReportManagement: React.FC = () => {
                     </td>
                     <td className="px-4 py-2 text-slate-600">{transaction.category}</td>
                     <td className="px-4 py-2 text-slate-600">{transaction.description}</td>
+                    <td className="px-4 py-2 text-slate-600 text-xs">{transaction.paymentMethod}</td>
                     <td className="px-4 py-2 text-right font-semibold" style={{ color: transaction.type === 'income' ? '#10b981' : '#ef4444' }}>
-                      {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
+                      {transaction.type === 'income' ? '+' : '-'} {formatCurrency(Math.round(Number(transaction.amount) || 0))}
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-4 text-center text-slate-600">Tidak ada data transaksi</td>
+                  </tr>
+                )}
               </tbody>
             </table>
             <div className="mt-6 p-4 bg-slate-50 rounded-lg space-y-2">
-              <p className="text-sm text-slate-700"><strong>Total Pemasukan:</strong> <span className="text-green-700 font-bold">{formatCurrency(financeData.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0))}</span></p>
-              <p className="text-sm text-slate-700"><strong>Total Pengeluaran:</strong> <span className="text-red-700 font-bold">{formatCurrency(financeData.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0))}</span></p>
-              <p className="text-sm text-slate-700 pt-2 border-t border-slate-200"><strong>Net Profit:</strong> <span className="text-blue-700 font-bold">{formatCurrency(financeData.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) - financeData.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0))}</span></p>
+              <p className="text-sm text-slate-700"><strong>Total Pemasukan:</strong> <span className="text-green-700 font-bold">{formatCurrency(Math.round(Array.isArray(financesData) ? financesData.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0) : 0))}</span></p>
+              <p className="text-sm text-slate-700"><strong>Total Pengeluaran:</strong> <span className="text-red-700 font-bold">{formatCurrency(Math.round(Array.isArray(financesData) ? financesData.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0) : 0))}</span></p>
+              <p className="text-sm text-slate-700 pt-2 border-t border-slate-200"><strong>Net Profit:</strong> <span className="text-blue-700 font-bold">{formatCurrency(Math.round((Array.isArray(financesData) ? financesData.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0) : 0) - (Array.isArray(financesData) ? financesData.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0) : 0)))}</span></p>
             </div>
           </div>
         )}

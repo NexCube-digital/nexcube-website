@@ -2,6 +2,16 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 /// <reference types="vite/client" />
 
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_API_URL?: string;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export interface ApiResponse<T> {
@@ -12,15 +22,19 @@ export interface ApiResponse<T> {
   statusCode: number;
 }
 
-export interface User {
-  id: number;
+export interface IUser {
+  id?: number;
   email: string;
+  password?: string; // Password tidak perlu di frontend untuk display
   name: string;
-  role: 'admin' | 'user';
-  isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  role?: 'admin' | 'user';
+  isActive?: boolean;
+  createdAt?: string; // API returns as string, convert to Date as needed
+  updatedAt?: string; // API returns as string, convert to Date as needed
 }
+
+// Type alias untuk compatibility
+export type User = IUser;
 
 export interface AuthResponse {
   user: User;
@@ -36,7 +50,12 @@ export interface Contact {
   message: string;
   service?: 'website' | 'undangan' | 'desain' | 'katalog';
   budget?: '< 1jt' | '1-3jt' | '3-5jt' | '5-10jt' | '> 10jt';
-  status: 'new' | 'read' | 'responded';
+  status: 'new' | 'read' | 'responded' | 'active' | 'inactive';
+  cpanelUrl?: string;
+  cpanelUsername?: string;
+  cpanelPassword?: string;
+  packageStartDate?: string | Date | null;
+  packageDuration?: number | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -51,6 +70,55 @@ export interface Portfolio {
   technologies?: string;
   link?: string;
   featured: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Invoice {
+  id: number;
+  invoiceNumber: string;
+  clientId?: number;
+  clientName?: string;
+  clientEmail?: string;
+  client?: {
+    id: number;
+    name: string;
+    email?: string;
+    company?: string;
+  };
+  amount: number;
+  status: 'draft' | 'sent' | 'paid' | 'overdue';
+  issueDate: string;
+  dueDate: string;
+  service?: 'website' | 'undangan' | 'desain' | 'katalog';
+  priceBreakdown?: string | null;
+  description?: string;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Finance {
+  id: number;
+  type: 'income' | 'expense';
+  category: string;
+  amount: number;
+  description: string;
+  date: string;
+  paymentMethod?: string;
+  status: 'pending' | 'completed' | 'cancelled';
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Report {
+  id: number;
+  title: string;
+  type: 'clients' | 'invoices' | 'finance' | 'performance';
+  period: string;
+  data: any;
+  generatedBy: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -169,7 +237,12 @@ class ApiClient {
   }
 
   async getProfile(): Promise<ApiResponse<User>> {
-    return this.request<User>('/auth/profile', 'GET');
+    const response = await this.request<any>('/auth/profile', 'GET');
+    // Backend returns { user: {...} }, so we need to extract it
+    if (response.data && response.data.user) {
+      response.data = response.data.user;
+    }
+    return response as ApiResponse<User>;
   }
 
   // Contact endpoints
@@ -187,6 +260,14 @@ class ApiClient {
 
   async updateContactStatus(id: string, status: Contact['status']): Promise<ApiResponse<Contact>> {
     return this.request<Contact>(`/contacts/${id}/status`, 'PUT', { status });
+  }
+
+  async updateContact(id: string, data: Partial<Contact>): Promise<ApiResponse<Contact>> {
+    return this.request<Contact>(`/contacts/${id}`, 'PUT', data);
+  }
+
+  async deleteContact(id: string | number): Promise<ApiResponse<void>> {
+    return this.request<void>(`/contacts/${id}`, 'DELETE');
   }
 
   // Portfolio endpoints
@@ -209,6 +290,92 @@ class ApiClient {
 
   async deletePortfolio(id: string): Promise<ApiResponse<void>> {
     return this.request<void>(`/portfolios/${id}`, 'DELETE');
+  }
+
+  // Invoice endpoints
+  async getInvoices(): Promise<ApiResponse<Invoice[]>> {
+    const response = await this.request<any[]>('/invoices', 'GET');
+    if (response.data && Array.isArray(response.data)) {
+      response.data = response.data.map((invoice: any) => ({
+        ...invoice,
+        clientName: invoice.client?.name || invoice.clientName || 'Unknown Client',
+      }));
+    }
+    return response as ApiResponse<Invoice[]>;
+  }
+
+  async getInvoice(id: string): Promise<ApiResponse<Invoice>> {
+    const response = await this.request<any>(`/invoices/${id}`, 'GET');
+    if (response.data) {
+      response.data.clientName = response.data.client?.name || response.data.clientName || 'Unknown Client';
+    }
+    return response as ApiResponse<Invoice>;
+  }
+
+  async createInvoice(data: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Invoice>> {
+    return this.request<Invoice>('/invoices', 'POST', data);
+  }
+
+  async updateInvoice(id: string, data: Partial<Invoice>): Promise<ApiResponse<Invoice>> {
+    return this.request<Invoice>(`/invoices/${id}`, 'PUT', data);
+  }
+
+  async deleteInvoice(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/invoices/${id}`, 'DELETE');
+  }
+
+  async updateInvoiceStatus(id: string, status: Invoice['status']): Promise<ApiResponse<Invoice>> {
+    return this.request<Invoice>(`/invoices/${id}/status`, 'PUT', { status });
+  }
+
+  // Finance endpoints
+  async getFinances(): Promise<ApiResponse<Finance[]>> {
+    return this.request<Finance[]>('/finances', 'GET');
+  }
+
+  async getFinance(id: string): Promise<ApiResponse<Finance>> {
+    return this.request<Finance>(`/finances/${id}`, 'GET');
+  }
+
+  async createFinance(data: Omit<Finance, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Finance>> {
+    return this.request<Finance>('/finances', 'POST', data);
+  }
+
+  async updateFinance(id: string, data: Partial<Finance>): Promise<ApiResponse<Finance>> {
+    return this.request<Finance>(`/finances/${id}`, 'PUT', data);
+  }
+
+  async deleteFinance(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/finances/${id}`, 'DELETE');
+  }
+
+  async getFinanceSummary(): Promise<ApiResponse<any>> {
+    return this.request<any>('/finances/summary/all', 'GET');
+  }
+
+  // Report endpoints
+  async getReports(): Promise<ApiResponse<Report[]>> {
+    return this.request<Report[]>('/reports', 'GET');
+  }
+
+  async getReport(id: string): Promise<ApiResponse<Report>> {
+    return this.request<Report>(`/reports/${id}`, 'GET');
+  }
+
+  async generateClientReport(data: any): Promise<ApiResponse<Report>> {
+    return this.request<Report>('/reports/generate/clients', 'POST', data);
+  }
+
+  async generateInvoiceReport(data: any): Promise<ApiResponse<Report>> {
+    return this.request<Report>('/reports/generate/invoices', 'POST', data);
+  }
+
+  async generateFinanceReport(data: any): Promise<ApiResponse<Report>> {
+    return this.request<Report>('/reports/generate/finance', 'POST', data);
+  }
+
+  async deleteReport(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/reports/${id}`, 'DELETE');
   }
 }
 

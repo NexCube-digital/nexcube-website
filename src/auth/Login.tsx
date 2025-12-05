@@ -4,11 +4,26 @@ import { Helmet } from 'react-helmet-async'
 import apiClient, { AuthResponse } from '../services/api'
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState('admin@nexcube.digital')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
+
+  // Load saved email on component mount
+  React.useEffect(() => {
+    const savedEmail = localStorage.getItem('savedEmail')
+    const savedPassword = localStorage.getItem('savedPassword')
+    if (savedEmail) {
+      setEmail(savedEmail)
+      setRememberMe(true)
+    }
+    if (savedPassword) {
+      setPassword(savedPassword)
+    }
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,8 +40,31 @@ export const Login: React.FC = () => {
       const response = await apiClient.login(email, password)
       
       if (response.success && response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data.user))
+        console.log('Login response:', response.data)
+        
+        // Save user data
+        const userData = response.data.user
+        localStorage.setItem('user', JSON.stringify(userData))
+        console.log('Saved user to localStorage:', userData)
+        
+        // Save token with both keys for compatibility
+        localStorage.setItem('authToken', response.data.token)
         localStorage.setItem('token', response.data.token)
+        console.log('Saved tokens')
+        
+        // Also set token in apiClient
+        apiClient.setToken(response.data.token)
+        
+        // Save email and password if "Remember Me" is checked
+        if (rememberMe) {
+          localStorage.setItem('savedEmail', email)
+          localStorage.setItem('savedPassword', password)
+        } else {
+          // Clear saved credentials if "Remember Me" is unchecked
+          localStorage.removeItem('savedEmail')
+          localStorage.removeItem('savedPassword')
+        }
+        
         navigate('/dashboard')
       }
     } catch (err: any) {
@@ -36,78 +74,143 @@ export const Login: React.FC = () => {
     }
   }
 
-  const handleDemoLogin = () => {
-    setEmail('admin@nexcube.digital')
-    setPassword('admin123456')
-  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
       <Helmet>
-        <title>Login - NexCube Digital Admin</title>
-        <meta name="description" content="Login ke dashboard admin NexCube Digital" />
+        <title>Admin Login - NexCube Digital</title>
+        <meta name="description" content="Login ke dashboard admin NexCube Digital untuk mengelola bisnis Anda" />
       </Helmet>
 
-      {/* Background elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 animate-pulse" style={{ animationDelay: '1s' }}></div>
+      {/* Animated Background Gradient */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      </div>
 
       <div className="w-full max-w-md relative z-10">
-        <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 hover:border-white/40 transition-all duration-300">
+        {/* Card Container */}
+        <div className="bg-white/10 backdrop-blur-2xl rounded-2xl p-8 shadow-2xl border border-white/20 hover:border-white/30 transition-all duration-500">
+          
+          {/* Header */}
           <div className="text-center mb-8">
-            <img 
-              src="/images/NexCube-full.png" 
-              alt="NexCube Digital" 
-              className="h-16 w-auto mx-auto mb-4 drop-shadow-lg"
-            />
-            <h1 className="text-3xl font-bold text-white mb-2">NexCube Admin</h1>
-            <p className="text-blue-100 text-sm">Dashboard Manajemen</p>
+            <div className="flex justify-center mb-6">
+              <img 
+                src="/images/NexCube-full.png" 
+                alt="NexCube Digital" 
+                className="h-14 w-auto drop-shadow-2xl"
+              />
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
+            <p className="text-blue-200 text-sm font-medium">Kelola bisnis Anda dengan mudah</p>
           </div>
 
+          {/* Error Alert */}
           {error && (
-            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm animate-shake">
+            <div className="mb-6 p-4 bg-red-500/15 border border-red-500/40 rounded-lg text-red-200 text-sm backdrop-blur-sm animate-pulse">
               <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <span>{error}</span>
+                <div>
+                  <p className="font-semibold">Login Gagal</p>
+                  <p className="text-red-100 mt-0.5">{error}</p>
+                </div>
               </div>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-white text-sm font-semibold mb-2">
-                Email
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email Field */}
+            <div className="group">
+              <label className="block text-white text-sm font-semibold mb-3">
+                Email Address
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-300"
-                placeholder="admin@nexcube.digital"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 group-focus-within:text-blue-300 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:bg-white/10 transition-all duration-300"
+                  placeholder="admin@nexcube.digital"
+                  disabled={isLoading}
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-white text-sm font-semibold mb-2">
+            {/* Password Field */}
+            <div className="group">
+              <label className="block text-white text-sm font-semibold mb-3">
                 Password
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all duration-300"
-                placeholder="••••••••"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 group-focus-within:text-blue-300 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-12 pr-12 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:bg-white/10 transition-all duration-300"
+                  placeholder="••••••••••"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-300 transition-colors"
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                      <path d="M15.171 13.576l1.472 1.473a1 1 0 001.414-1.414l-14-14a1 1 0 00-1.414 1.414l1.473 1.473A10.014 10.014 0 00.458 10C1.732 14.057 5.522 17 10 17a9.958 9.958 0 004.512-1.074l1.472 1.472a1 1 0 001.414-1.414z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
+            {/* Remember Me & Options */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 bg-white/10 border border-white/30 rounded cursor-pointer accent-blue-500 group-hover:border-white/50 transition-colors"
+                  disabled={isLoading}
+                />
+                <span className="text-white/80 text-sm font-medium group-hover:text-white/100 transition-colors">
+                  Ingat saya
+                </span>
+              </label>
+              <Link to="/" className="text-blue-300 hover:text-blue-200 text-sm font-medium transition-colors">
+                Kembali Home
+              </Link>
+            </div>
+
+            {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-2xl hover:scale-[1.02] active:scale-95 mt-2"
             >
               {isLoading ? (
                 <>
@@ -120,59 +223,21 @@ export const Login: React.FC = () => {
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                   </svg>
-                  Masuk
+                  Masuk ke Dashboard
                 </>
               )}
             </button>
           </form>
-
-          <div className="mt-8 p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl backdrop-blur-sm">
-            <p className="text-blue-100 text-xs font-black mb-3 uppercase tracking-wider">📝 Demo Credentials:</p>
-            <div className="space-y-2 mb-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-300 font-mono text-xs bg-white/10 px-2 py-1 rounded">admin@nexcube.digital</span>
-                <button
-                  type="button"
-                  onClick={() => setEmail('admin@nexcube.digital')}
-                  className="text-blue-200 hover:text-blue-100 text-xs font-semibold transition-colors"
-                  title="Copy email"
-                >
-                  📋
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-300 font-mono text-xs bg-white/10 px-2 py-1 rounded">change_this_password</span>
-                <button
-                  type="button"
-                  onClick={() => setPassword('change_this_password')}
-                  className="text-blue-200 hover:text-blue-100 text-xs font-semibold transition-colors"
-                  title="Copy password"
-                >
-                  📋
-                </button>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              className="w-full text-xs font-bold text-blue-100 bg-blue-600/50 hover:bg-blue-600/70 px-3 py-2 rounded-lg transition-all duration-200"
-            >
-              ⚡ Auto-fill Demo
-            </button>
-          </div>
-
-          <div className="mt-6 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-            <p className="text-amber-100 text-xs leading-relaxed">
-              💡 <span className="font-semibold">Ini adalah mode DEMO</span>. Gunakan kredensial demo di atas untuk login ke dashboard.
-            </p>
-          </div>
         </div>
 
-        <p className="text-center text-white/60 mt-8 text-sm">
-          Kembali ke <Link to="/" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Website</Link>
-        </p>
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-white/60 text-sm">
+            © 2025 NexCube Digital. All rights reserved.
+          </p>
+        </div>
       </div>
     </div>
   )

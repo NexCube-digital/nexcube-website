@@ -1,18 +1,17 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import apiClient from '../../services/api'
 
 interface SidebarProps {
   open: boolean
   setOpen: (open: boolean) => void
   activeTab: string
-  setActiveTab: (tab: string) => void
 }
 
 export const DashboardSidebar: React.FC<SidebarProps> = ({ 
   open, 
   setOpen, 
-  activeTab, 
-  setActiveTab 
+  activeTab
 }) => {
   const navigate = useNavigate()
 
@@ -45,7 +44,7 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({
       )
     },
     {
-      id: 'finance',
+      id: 'finances',
       label: 'Keuangan',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,8 +64,17 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({
   ]
 
   const handleLogout = () => {
+    // Clear all authentication data
     localStorage.removeItem('authToken')
+    localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('savedEmail')
+    localStorage.removeItem('savedPassword')
+    
+    // Clear apiClient token
+    apiClient.setToken(null)
+    
+    // Redirect to login
     navigate('/login')
   }
 
@@ -103,11 +111,13 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => {
-                  setActiveTab(item.id)
+                  const path = item.id === 'overview' ? '/dashboard' : `/dashboard/${item.id}`
+                  navigate(path)
                   setOpen(false)
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  activeTab === item.id
+                  (item.id === 'overview' && (activeTab === '' || activeTab === 'overview')) || 
+                  (item.id !== 'overview' && activeTab === item.id)
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
@@ -117,19 +127,11 @@ export const DashboardSidebar: React.FC<SidebarProps> = ({
               </button>
             ))}
           </nav>
-
-          {/* Logout Button */}
-          <div className="p-4 border-t border-white/10">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all duration-200"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span className="font-semibold">Logout</span>
-            </button>
-          </div>
+          <div className="mt-8 text-center">
+          <p className="text-white/60 text-sm">
+            © 2025 NexCube Digital.
+          </p>
+        </div>
         </div>
       </div>
     </>

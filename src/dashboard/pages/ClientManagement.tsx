@@ -1,124 +1,235 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import apiClient, { Contact } from '../../services/api'
+import { CPanelTable } from './client/CPanelTable'
+import { ClientDetailModal } from './client/ClientDetailModal'
+import { FormClient } from './client/FormClient'
 
-interface Client {
-  id: string
-  name: string
-  email: string
-  phone: string
-  company: string
-  address: string
-  status: 'aktif' | 'tidak-aktif'
-  createdAt: string
+interface Client extends Contact {
+  // Extending Contact interface for client management
 }
 
 export const ClientManagement: React.FC = () => {
-  const [clients, setClients] = useState<Client[]>([
-    {
-      id: '1',
-      name: 'PT Maju Bersama',
-      email: 'info@majubersama.com',
-      phone: '+62 812 3456 7890',
-      company: 'PT Maju Bersama',
-      address: 'Jl. Ahmad Yani No. 123, Bandung',
-      status: 'aktif',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'Karomah Food',
-      email: 'karomah@email.com',
-      phone: '+62 813 4567 8901',
-      company: 'Karomah Food',
-      address: 'Jl. Gatot Subroto No. 456, Bandung',
-      status: 'aktif',
-      createdAt: '2024-01-20'
-    }
-  ])
-
-  const [showForm, setShowForm] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [clients, setClients] = useState<Client[]>([])
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [formData, setFormData] = useState<Omit<Client, 'id' | 'createdAt'>>({
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false)
+
+  // Check if form should be shown based on URL
+  const showForm = location.pathname.includes('/formclient')
+
+  const [formData, setFormData] = useState<Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>>({
     name: '',
     email: '',
     phone: '',
     company: '',
-    address: '',
-    status: 'aktif'
+    message: '',
+    service: undefined,
+    budget: undefined,
+    status: 'new',
+    cpanelUrl: '',
+    cpanelUsername: '',
+    cpanelPassword: '',
+    packageStartDate: null,
+    packageDuration: null
   })
 
-  const filteredClients = clients.filter(client =>
+  // Load contacts/clients from backend
+  const loadClients = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const response = await apiClient.getContacts()
+      if (response.success && response.data) {
+        setClients(response.data)
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to load clients')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadClients()
+  }, [])
+
+  const filteredClients = Array.isArray(clients) ? clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.company.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+    client.company?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : []
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (editingId) {
-      setClients(prev => prev.map(client =>
-        client.id === editingId
-          ? { ...client, ...formData }
-          : client
-      ))
-      setEditingId(null)
+    // Handle packageDuration as number
+    if (name === 'packageDuration') {
+      setFormData(prev => ({ ...prev, [name]: value ? parseInt(value) : null }))
     } else {
-      const newClient: Client = {
-        id: Date.now().toString(),
-        ...formData,
-        createdAt: new Date().toISOString().split('T')[0]
-      }
-      setClients(prev => [newClient, ...prev])
+      setFormData(prev => ({ ...prev, [name]: value }))
     }
-
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      address: '',
-      status: 'aktif'
-    })
-    setShowForm(false)
   }
 
-  const handleEdit = (client: Client) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    try {
+      setLoading(true)
+      setError('')
+
+      if (editingId) {
+        // Update existing contact with all fields including package
+        const response = await apiClient.updateContact(editingId, {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company,
+          message: formData.message,
+          service: formData.service,
+          budget: formData.budget,
+          status: formData.status,
+          cpanelUrl: formData.cpanelUrl,
+          cpanelUsername: formData.cpanelUsername,
+          cpanelPassword: formData.cpanelPassword,
+          packageStartDate: formData.packageStartDate,
+          packageDuration: formData.packageDuration
+        })
+        if (response.success) {
+          await loadClients() // Refresh the list
+        }
+      } else {
+        // Create new contact
+        const response = await apiClient.submitContact({
+          ...formData,
+          message: formData.message || 'Client created from dashboard'
+        })
+        if (response.success) {
+          await loadClients() // Refresh the list
+        }
+      }
+
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        message: '',
+        service: undefined,
+        budget: undefined,
+        status: 'new',
+        cpanelUrl: '',
+        cpanelUsername: '',
+        cpanelPassword: '',
+        packageStartDate: null,
+        packageDuration: null
+      })
+      setEditingId(null)
+      // Navigate back to clients list after successful save
+      navigate('/dashboard/clients')
+    } catch (err: any) {
+      setError(err.message || 'Failed to save client')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEditClient = (client: Client) => {
     setFormData({
       name: client.name,
       email: client.email,
-      phone: client.phone,
-      company: client.company,
-      address: client.address,
-      status: client.status
+      phone: client.phone || '',
+      company: client.company || '',
+      message: client.message,
+      service: client.service,
+      budget: client.budget,
+      status: client.status,
+      cpanelUrl: client.cpanelUrl || '',
+      cpanelUsername: client.cpanelUsername || '',
+      cpanelPassword: client.cpanelPassword || '',
+      packageStartDate: client.packageStartDate || null,
+      packageDuration: client.packageDuration || null
     })
-    setEditingId(client.id)
-    setShowForm(true)
+    setEditingId(client.id.toString())
+    // Navigate to form with edit mode
+    navigate('/dashboard/clients/formclient')
   }
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus klien ini?')) {
-      setClients(prev => prev.filter(client => client.id !== id))
+  const handleViewDetail = (client: Client) => {
+    setSelectedClient(client)
+    setShowDetailModal(true)
+  }
+
+  const handleCloseDetailModal = () => {
+    setShowDetailModal(false)
+    setSelectedClient(null)
+  }
+
+  const handleDeleteClient = async (clientId: number) => {
+    try {
+      setLoading(true)
+      setError('')
+      await apiClient.deleteContact(clientId.toString())
+      await loadClients() // Refresh the list after delete
+      setLoading(false)
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete client')
+      setLoading(false)
+      throw err // Re-throw for toast notification in CPanelTable
     }
   }
 
   const handleCancel = () => {
-    setShowForm(false)
     setEditingId(null)
     setFormData({
       name: '',
       email: '',
       phone: '',
       company: '',
-      address: '',
-      status: 'aktif'
+      message: '',
+      service: undefined,
+      budget: undefined,
+      status: 'new',
+      cpanelUrl: '',
+      cpanelUsername: '',
+      cpanelPassword: '',
+      packageStartDate: null,
+      packageDuration: null
     })
+    // Navigate back to clients list
+    navigate('/dashboard/clients')
+  }
+
+  const handleUpdateCPanel = async (clientId: number, cpanelData: any) => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      // Call API to update contact with cPanel data
+      const response = await apiClient.updateContact(clientId.toString(), {
+        cpanelUrl: cpanelData.cpanelUrl,
+        cpanelUsername: cpanelData.cpanelUsername,
+        cpanelPassword: cpanelData.cpanelPassword
+      })
+
+      if (response.success) {
+        // Refresh clients list
+        await loadClients()
+        // Show success message (you might want to add toast notification here)
+        console.log('cPanel updated successfully')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to update cPanel')
+      console.error('Error updating cPanel:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -127,229 +238,95 @@ export const ClientManagement: React.FC = () => {
         <title>Manajemen Klien - NexCube Dashboard</title>
       </Helmet>
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Manajemen Klien</h1>
-          <p className="text-slate-600 mt-2">Kelola data klien dan informasi kontak</p>
+      {/* Page Container with Fade-In Animation */}
+      <div className="animate-in fade-in duration-500">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Manajemen Klien</h1>
+            <p className="text-slate-600 mt-2">Kelola data klien dan informasi hosting</p>
+          </div>
+          {!showForm && (
+            <button
+              onClick={() => {
+                setIsPageTransitioning(true)
+                setTimeout(() => navigate('/dashboard/clients/formclient'), 150)
+              }}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all hover:scale-105"
+            >
+              + Tambah Klien
+            </button>
+          )}
         </div>
-        {!showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all hover:scale-105"
-          >
-            + Tambah Klien
-          </button>
+
+        {/* Form */}
+        {showForm && (
+          <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+            <FormClient
+              formData={formData}
+              editingId={editingId}
+              loading={loading}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
+          </div>
         )}
-      </div>
 
-      {/* Form */}
-      {showForm && (
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
-          <h2 className="text-2xl font-bold mb-6 text-slate-900">
-            {editingId ? 'Edit Klien' : 'Tambah Klien Baru'}
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Nama Kontak <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Nama lengkap"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="email@example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Telepon <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="+62 812 3456 7890"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Perusahaan <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Nama perusahaan"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Alamat <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                  rows={3}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Alamat lengkap"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="aktif">Aktif</option>
-                  <option value="tidak-aktif">Tidak Aktif</option>
-                </select>
-              </div>
+        {/* Table & Stats - Only show when not in form view */}
+        {!showForm && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Search & Filter */}
+            <div className="mb-6 flex gap-4">
+              <input
+                type="text"
+                placeholder="Cari klien..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
-            <div className="flex gap-3 pt-6 border-t border-slate-200">
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-2.5 rounded-lg font-bold hover:shadow-lg transition-all"
-              >
-                {editingId ? 'Update Klien' : 'Tambah Klien'}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition-all"
-              >
-                Batal
-              </button>
+            {/* Clients Table Section Header */}
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-slate-900">Daftar Klien</h2>
+              <p className="text-sm text-slate-600">Kelola dan edit informasi klien</p>
             </div>
-          </form>
-        </div>
-      )}
 
-      {/* Search & Filter */}
-      <div className="mb-6 flex gap-4">
-        <input
-          type="text"
-          placeholder="Cari klien..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {/* Unified Client & cPanel Table */}
+            <CPanelTable 
+              clients={clients}
+              onUpdate={handleUpdateCPanel}
+              loading={loading}
+              onEditClient={handleEditClient}
+              onDeleteClient={handleDeleteClient}
+              onViewDetail={handleViewDetail}
+            />
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+                <p className="text-slate-600 text-sm mb-2">Total Klien</p>
+                <p className="text-3xl font-bold text-slate-900">{Array.isArray(clients) ? clients.length : 0}</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+                <p className="text-slate-600 text-sm mb-2">Responded</p>
+                <p className="text-3xl font-bold text-green-600">{Array.isArray(clients) ? clients.filter(c => c.status === 'responded').length : 0}</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+                <p className="text-slate-600 text-sm mb-2">New Leads</p>
+                <p className="text-3xl font-bold text-blue-600">{Array.isArray(clients) ? clients.filter(c => c.status === 'new').length : 0}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Client Detail Modal */}
+        <ClientDetailModal 
+          isOpen={showDetailModal}
+          client={selectedClient}
+          onClose={handleCloseDetailModal}
         />
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-bold">Nama</th>
-                <th className="px-6 py-4 text-left text-sm font-bold">Email</th>
-                <th className="px-6 py-4 text-left text-sm font-bold">Telepon</th>
-                <th className="px-6 py-4 text-left text-sm font-bold">Perusahaan</th>
-                <th className="px-6 py-4 text-left text-sm font-bold">Status</th>
-                <th className="px-6 py-4 text-center text-sm font-bold">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filteredClients.length > 0 ? (
-                filteredClients.map((client) => (
-                  <tr key={client.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900">{client.name}</div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600">{client.email}</td>
-                    <td className="px-6 py-4 text-slate-600">{client.phone}</td>
-                    <td className="px-6 py-4 text-slate-600">{client.company}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                        client.status === 'aktif'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}>
-                        {client.status === 'aktif' ? 'Aktif' : 'Tidak Aktif'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex gap-2 justify-center">
-                        <button
-                          onClick={() => handleEdit(client)}
-                          className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold hover:bg-blue-200 transition-all"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(client.id)}
-                          className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-bold hover:bg-red-200 transition-all"
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                    Tidak ada data klien
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
-          <p className="text-slate-600 text-sm mb-2">Total Klien</p>
-          <p className="text-3xl font-bold text-slate-900">{clients.length}</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
-          <p className="text-slate-600 text-sm mb-2">Klien Aktif</p>
-          <p className="text-3xl font-bold text-green-600">{clients.filter(c => c.status === 'aktif').length}</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
-          <p className="text-slate-600 text-sm mb-2">Klien Tidak Aktif</p>
-          <p className="text-3xl font-bold text-red-600">{clients.filter(c => c.status === 'tidak-aktif').length}</p>
-        </div>
       </div>
     </div>
   )
