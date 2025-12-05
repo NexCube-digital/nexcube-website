@@ -14,6 +14,8 @@ const UndanganDigital = lazy(() => import('./paket/UndanganDigital').then(module
 const DesainGrafis = lazy(() => import('./paket/DesainGrafis').then(module => ({ default: module.DesainGrafis })));
 const MenuKatalog = lazy(() => import('./paket/MenuKatalog').then(module => ({ default: module.MenuKatalog })));
 const NotFound = lazy(() => import('./pages/NotFound').then(module => ({ default: module.NotFound })));
+const Login = lazy(() => import('./auth/Login').then(module => ({ default: module.Login })));
+const Dashboard = lazy(() => import('./dashboard/Dashboard').then(module => ({ default: module.Dashboard })));
 
 // Loading spinner for lazy loaded components
 const PageLoader = () => (
@@ -89,6 +91,11 @@ export default function App() {
               <Route path="/paket/undangan-digital" element={<UndanganDigital />} />
               <Route path="/paket/desain-grafis" element={<DesainGrafis />} />
               <Route path="/paket/menu-katalog" element={<MenuKatalog />} />
+              
+              {/* Admin Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </PageTransition>
